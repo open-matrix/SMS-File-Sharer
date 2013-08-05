@@ -6,8 +6,8 @@ import com.Matrix.smsfilesharer.model.SMSFile;
 
 public class SMSFileSharerHelper {
 
-	public void sendFile(String fileName,Context context) {
-		SMSFile smsFile=new SMSFile(fileName, context);
+	public void sendFile(Context context, String fileName, String receiverNumber) {
+		SMSFile smsFile = new SMSFile(context, fileName, receiverNumber);
 	}
 
 	public String receiveFile() {

@@ -1,7 +1,5 @@
 package com.Matrix.smsfilesharer.model;
 
-import java.util.ArrayList;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -45,16 +43,18 @@ public class ConstructSmsFileAsycTask extends AsyncTask<String, String, String> 
 		try {
 			SMSFileSenderEngine smsFileSenderEngine = new SMSFileSenderEngine(
 					params[0]);
-			ArrayList<String> fullSmsData = smsFileSenderEngine
-					.getFullDataSms();
-			Log.e(TAG, "Number of sms : " + fullSmsData.size());
-			for (int i = 0; i < fullSmsData.size(); i++) {
-				Log.e(TAG, "SqNo = " + i);
-				Log.e(TAG, "Size = " + fullSmsData.get(i).length());
-				Log.e(TAG, fullSmsData.get(i));
-			}
+			mSmsFile.setFileName(smsFileSenderEngine.getFileName());
+			mSmsFile.setMimeType(smsFileSenderEngine.getMime());
+			mSmsFile.setFileContentSize(smsFileSenderEngine
+					.getFileContentLength());
+			mSmsFile.setNumberOfDataSms(smsFileSenderEngine
+					.getNumberOfDataSms());
+			mSmsFile.saveSmsFile();
+			mSmsFile.setDataSmsArrayList(smsFileSenderEngine.getFullDataSms(
+					mContext, mSmsFile.getSessionId()));
 
 		} catch (Exception e) {
+			Log.e(TAG, e.getMessage());
 			mException = e;
 			isExaption = true;
 		}
@@ -67,5 +67,4 @@ public class ConstructSmsFileAsycTask extends AsyncTask<String, String, String> 
 		progressDialog.dismiss();
 		mErrorHandler.notifyErrorReport(mException, isExaption);
 	}
-
 }

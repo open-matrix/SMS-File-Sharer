@@ -1,29 +1,29 @@
 package com.Matrix.smsfilesharer.model;
 
-import com.Matrix.smsfilesharer.db.SMSFileSharerDataBase;
-
 import android.content.Context;
 import android.database.SQLException;
 
+import com.Matrix.smsfilesharer.db.SMSFileSharerDataBase;
+
 public class DataSMS {
-	private int mSessioId;
+	private String mSessioId;
 	private int mSeqNumber;
-	private String mData;
+	private String mFullData;
 	private boolean mStatus;
 	private Context mContext;
 
-	public DataSMS(int sessionId, int seqNumber, Context context) {
+	public DataSMS(String sessionId, int seqNumber, Context context) {
 		mSessioId = sessionId;
 		mSeqNumber = seqNumber;
 		mContext = context;
 		SMSFileSharerDataBase db = new SMSFileSharerDataBase(mContext);
 		String[] dataSmsContent = db.getDataSmsContent(mSessioId, mSeqNumber);
 		db.close();
-		mData = dataSmsContent[0];
+		mFullData = dataSmsContent[0];
 		mStatus = dataSmsContent[1].equals("1") ? true : false;
 	}
 
-	public int getSessionId() {
+	public String getSessionId() {
 		return mSessioId;
 	}
 
@@ -31,8 +31,8 @@ public class DataSMS {
 		return mSeqNumber;
 	}
 
-	public String getData() {
-		return mData;
+	public String getFullData() {
+		return mFullData;
 	}
 
 	public boolean isSend() {
@@ -49,5 +49,14 @@ public class DataSMS {
 		} finally {
 			db.close();
 		}
+	}
+
+	public String getSmsBody() {
+		String[] sms = mFullData.split(CommenConstance.SMS_NEW_LINE_SPLITTER);
+		return sms[1];
+	}
+
+	public String toString() {
+		return getSmsBody();
 	}
 }

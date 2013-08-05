@@ -10,7 +10,7 @@ import com.Matrix.smsfilesharer.model.SMSFile;
 
 public class SMSFileSharerDataBase {
 
-	String TAG = "UAEOneDataBase";
+	String TAG = "SMSFileSharerDataBase";
 	private final Context mContext;
 	private DatabaseHelper mDatabaseHelper;
 	public static final String DATABASE_NAME = "sms_file_sharer";
@@ -37,7 +37,7 @@ public class SMSFileSharerDataBase {
 			+ TABLE_SMS_FILE_DETAILS
 			+ "("
 			+ COL_SESSION_ID
-			+ " INTEGER AUTO_INCREMENT,"
+			+ " VARCHAR(256),"
 			+ COL_IS_NOTICE_RECIVED
 			+ " BOOLEAN NOT NULL DEFAULT 0, "
 			+ COL_ADDRESS_NUMBER
@@ -62,12 +62,12 @@ public class SMSFileSharerDataBase {
 			+ TABLE_DATA_SMS
 			+ "("
 			+ COL_SESSION_ID
-			+ " INTEGER, "
+			+ "  VARCHAR(256), "
 			+ COL_SEQ_NUMBER
 			+ " INTEGER, "
 			+ COL_DATA
 			+ " VARCHAR(160), "
-			+ COL_STATUS
+			+ COL_SENDER_STATUS
 			+ " BOOLEAN NOT NULL DEFAULT 0, "
 			+ "PRIMARY KEY ("
 			+ COL_SESSION_ID
@@ -91,11 +91,11 @@ public class SMSFileSharerDataBase {
 		mDatabaseHelper.close();
 	}
 
-	public String[] getDataSmsContent(int sessionId, int seqNumber) {
+	public String[] getDataSmsContent(String sessionId, int seqNumber) {
 		SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
 		Cursor cursor = db.query(TABLE_DATA_SMS, new String[] { COL_DATA,
-				COL_SENDER_STATUS }, COL_SESSION_ID + "=?, " + COL_SEQ_NUMBER
-				+ "=? ", new String[] { sessionId + "", seqNumber + "" }, null,
+				COL_SENDER_STATUS }, COL_SESSION_ID + "=? AND " + COL_SEQ_NUMBER
+				+ "=? ", new String[] { seqNumber + "" }, null,
 				null, null);
 		String result[] = new String[2];
 		if (cursor.moveToNext()) {
@@ -107,13 +107,13 @@ public class SMSFileSharerDataBase {
 		return result;
 	}
 
-	public void setDataSmsStatus(int sessionId, int seqNumber, boolean status) {
+	public void setDataSmsStatus(String sessionId, int seqNumber, boolean status) {
 		ContentValues contentValues = new ContentValues();
 		contentValues.put(COL_SENDER_STATUS, status);
 		SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
 		long result = db.update(TABLE_DATA_SMS, contentValues, COL_SESSION_ID
-				+ "=?, " + COL_SEQ_NUMBER + "=? ", new String[] {
-				sessionId + "", seqNumber + "" });
+				+ "=? AND " + COL_SEQ_NUMBER + "=? ", new String[] { sessionId,
+				seqNumber + "" });
 		if (result == 0)
 			throw new android.database.SQLException(
 					mContext.getString(R.string.error_while_setting_sms_status));
@@ -149,89 +149,30 @@ public class SMSFileSharerDataBase {
 		}
 		cursor.close();
 	}
-//	insertDa
-	// public long insertReminder(String nameString, String typeString,
-	// String expDateString, String remiderString) throws ParseException {
-	// ContentValues contentValues = new ContentValues();
-	// contentValues.put(COL_NAME, nameString);
-	// contentValues.put(COL_TYPE, typeString);
-	// contentValues.put(COL_EXP_DATE, DateManager
-	// .getDateAsMillisecondWithDefaultTime(mContext, expDateString));
-	// contentValues.put(COL_REMINDER_DATE, DateManager
-	// .getDateAsMillisecondWithDefaultTime(mContext, remiderString));
-	// SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
-	// return db.insert(TABLE_NAME, COL_NAME, contentValues);
-	// }
-	//
-	// public long updateReminder(String nameString, String typeString,
-	// String expDateString, String remiderString, String oldNameString,
-	// String oldTypeString) throws ParseException {
-	// ContentValues contentValues = new ContentValues();
-	// contentValues.put(COL_NAME, nameString);
-	// contentValues.put(COL_TYPE, typeString);
-	// contentValues.put(COL_EXP_DATE, DateManager
-	// .getDateAsMillisecondWithDefaultTime(mContext, expDateString));
-	// contentValues.put(COL_REMINDER_DATE, DateManager
-	// .getDateAsMillisecondWithDefaultTime(mContext, remiderString));
-	// SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
-	// return db.update(TABLE_NAME, contentValues, COL_NAME + "=? AND "
-	// + COL_TYPE + "=?",
-	// new String[] { oldNameString, oldTypeString });
-	// }
-	//
-	// public long updateReminderDate(String nameString, String typeString,
-	// String reminderDateString) throws ParseException {
-	// ContentValues contentValues = new ContentValues();
-	// contentValues.put(COL_REMINDER_DATE, DateManager
-	// .getDateAsMillisecondWithDefaultTime(mContext,
-	// reminderDateString));
-	// SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
-	// return db.update(TABLE_NAME, contentValues, COL_NAME + "=? AND "
-	// + COL_TYPE + "=?", new String[] { nameString, typeString });
-	// }
-	//
-	// public int deleteReminder(String nameString, String typeString) {
-	// SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
-	// return db.delete(TABLE_NAME, COL_NAME + "=? AND " + COL_TYPE + "=?",
-	// new String[] { nameString, typeString });
-	// }
-	//
-	// public ArrayList<Reminder> getAllReminder() {
-	// ArrayList<Reminder> allReminderArrayList = new ArrayList<Reminder>();
-	// SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
-	// Cursor cursor = db.query(TABLE_NAME, new String[] { COL_NAME, COL_TYPE,
-	// COL_EXP_DATE, COL_REMINDER_DATE }, null, null, null, null,
-	// COL_EXP_DATE);
-	// while (cursor.moveToNext()) {
-	// allReminderArrayList
-	// .add(new ReminderListItem(
-	// cursor.getString(cursor
-	// .getColumnIndex(SMSFileSharerDataBase.COL_NAME)),
-	// cursor.getString(cursor
-	// .getColumnIndex(SMSFileSharerDataBase.COL_TYPE)),
-	// getDateStringFromMillisecond(cursor.getString(cursor
-	// .getColumnIndex(SMSFileSharerDataBase.COL_EXP_DATE))),
-	// getDateStringFromMillisecond(cursor.getString(cursor
-	// .getColumnIndex(SMSFileSharerDataBase.COL_REMINDER_DATE)))));
-	// }
-	// cursor.close();
-	// return allReminderArrayList;
-	// }
-	//
-	// private String getDateStringFromMillisecond(String dateString) {
-	// return DateManager.getDateStringFromMillisecond(mContext,
-	// Long.parseLong(dateString));
-	// }
-	//
-	// public boolean isTypeExist(String typeString) {
-	// SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
-	// Cursor cursor = db.query(TABLE_NAME, new String[] { COL_COUNT },
-	// COL_TYPE + "=?", new String[] { typeString }, null, null, null);
-	// String result = "0";
-	// if (cursor.moveToNext()) {
-	// result = cursor.getString(cursor.getColumnIndex(COL_COUNT));
-	// }
-	// cursor.close();
-	// return Integer.parseInt(result) > 0 ? true : false;
-	// }
+
+	public boolean insertDataSms(String sessionId, int seqNum, String data) {
+		ContentValues contentValues = new ContentValues();
+		contentValues.put(COL_SESSION_ID, sessionId);
+		contentValues.put(COL_SEQ_NUMBER, seqNum);
+		contentValues.put(COL_DATA, data);
+		SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
+		long result = db.insert(TABLE_DATA_SMS, COL_SESSION_ID, contentValues);
+		return result != -1;
+	}
+
+	public boolean insertSmsFile(String sessionId, String address,
+			boolean isReceiver, int numberOfDataSMS, int fileContentSize,
+			String fileName, String mimeType) {
+		ContentValues contentValues = new ContentValues();
+		contentValues.put(COL_SESSION_ID, sessionId);
+		contentValues.put(COL_ADDRESS_NUMBER, address);
+		contentValues.put(COL_IS_RECEIVER, isReceiver);
+		contentValues.put(COL_NUMBER_OF_DATA_SMS, numberOfDataSMS);
+		contentValues.put(COL_FILE_CONTENT_SIZE, fileContentSize);
+		contentValues.put(COL_FILE_NAME, fileName);
+		contentValues.put(COL_MIME_TYPE, mimeType);
+		SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
+		long result = db.insert(TABLE_SMS_FILE_DETAILS, COL_SESSION_ID, contentValues);
+		return result != -1;
+	}
 }

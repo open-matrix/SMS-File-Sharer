@@ -1,6 +1,8 @@
 package com.Matrix.smsfilesharer.model;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Random;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -10,9 +12,10 @@ import android.util.Log;
 import com.Matrix.smsfilesharer.R;
 import com.Matrix.smsfilesharer.db.SMSFileSharerDataBase;
 
-public class SMSFile implements SMSFileFromFileNameErrorHandler {
+public class SMSFile implements SMSFileFromFileNameErrorHandler,
+		SMSEngineConstants {
 	String TAG = "SMSFile";
-	private int mSessionId;
+	private String mSessionId;
 	private boolean isNoticeReceived;
 	private String mAddress;
 	private boolean isReceiver;
@@ -26,13 +29,26 @@ public class SMSFile implements SMSFileFromFileNameErrorHandler {
 	private Context mContext;
 
 	// Creatting SMSFile from given file(Sender side)
-	public SMSFile(String fileName, Context context) {
+	public SMSFile(Context context, String fileName, String phoneNumber) {
 		mContext = context;
+		mAddress = phoneNumber;
+		isReceiver = false;
+		isNoticeReceived = false;
+		mStatus = false;
+		mSessionId = generateSessionId();
 		new ConstructSmsFileAsycTask(context, this).execute(fileName);
 	}
 
+	private String generateSessionId() {
+		Random random = new Random(Calendar.getInstance().getTimeInMillis());
+		return Character.toString(GSM_CHARS_V1.charAt(random
+				.nextInt(GSM_CHARS_V1.length())))
+				+ Character.toString(GSM_CHARS_V1.charAt(random
+						.nextInt(GSM_CHARS_V1.length()))) + mAddress;
+	}
+
 	// Creatting SMSFile from DB using sessionId(Receiver side)
-	public SMSFile(int sesssionId, Context context) {
+	public SMSFile(String sesssionId, Context context) {
 		mContext = context;
 		mSessionId = sesssionId;
 		SMSFileSharerDataBase db = new SMSFileSharerDataBase(mContext);
@@ -72,7 +88,7 @@ public class SMSFile implements SMSFileFromFileNameErrorHandler {
 		}.execute();
 	}
 
-	public void setSessionId(int sessionId) {
+	public void setSessionId(String sessionId) {
 		mSessionId = sessionId;
 	}
 
@@ -116,7 +132,7 @@ public class SMSFile implements SMSFileFromFileNameErrorHandler {
 		return mNumberOfDataSMS;
 	}
 
-	public int getSessionId() {
+	public String getSessionId() {
 		return mSessionId;
 	}
 
@@ -124,6 +140,22 @@ public class SMSFile implements SMSFileFromFileNameErrorHandler {
 	public void notifyErrorReport(Exception e, boolean isExaption) {
 		if (isExaption)
 			Log.e(TAG, e.getMessage());
+		else
+			printLog();
 	}
 
+	public void saveSmsFile() {
+		SMSFileSharerDataBase db = new SMSFileSharerDataBase(mContext);
+		db.insertSmsFile(mSessionId, mAddress, isReceiver, mNumberOfDataSMS,
+				mFileContentSize, mFileName, mMimeType);
+		db.close();
+	}
+
+	private void printLog() {
+		Log.e(TAG, mSessionId + " " + isNoticeReceived + " " + isReceiver + " "
+				+ mAddress + " " + mStatus + " " + mFileContentSize + " "
+				+ mFileName + " " + mMimeType + " " + mNumberOfDataSMS);
+		for (int i = 0; i < mNumberOfDataSMS; i++)
+			Log.e(TAG, mDataSmsArrayList.get(i).getFullData());
+	}
 }

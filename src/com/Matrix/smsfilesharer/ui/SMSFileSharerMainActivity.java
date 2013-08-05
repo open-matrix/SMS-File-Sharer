@@ -24,7 +24,7 @@ public class SMSFileSharerMainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.smsfile_sharer_main_activity_layout);
 		fileNameTextView = (TextView) findViewById(R.id.fileNameTextView);
-		sfsHelper=new SMSFileSharerHelper();
+		sfsHelper = new SMSFileSharerHelper();
 	}
 
 	public void getFile(View v) {
@@ -45,7 +45,7 @@ public class SMSFileSharerMainActivity extends Activity {
 					Toast.LENGTH_SHORT).show();
 			return;
 		}
-		sfsHelper.sendFile(fileName,this);
+		sfsHelper.sendFile(this, fileName, "9739211838");
 	}
 
 	@Override

@@ -10,18 +10,29 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
+import android.content.Context;
+import android.util.Log;
+
+import com.Matrix.smsfilesharer.R;
+import com.Matrix.smsfilesharer.db.SMSFileSharerDataBase;
 
 public class SMSFileSenderEngine implements SMSEngineConstants {
+	String TAG = "SMSFileSenderEngine";
 	private byte[] mEncoded7bits;
 	private int mCurrentEncodedArrayIndex;
 	private int mFileContentLength;
-	private ArrayList<String> mFullDataSmsArrayList;
+	private String mFileName;
+	private String mMime;
+	private ArrayList<String> mFullDataSmsStringArrayList;
 
 	public SMSFileSenderEngine(String fileName) throws Exception {
+		mFileName = new File(fileName).getName();
+		mMime = getExtention();
 		fileName = compressInputFile(fileName);
 		byte[] fileContents = read(fileName);
 		mFileContentLength = fileContents.length;
@@ -29,8 +40,18 @@ public class SMSFileSenderEngine implements SMSEngineConstants {
 		mCurrentEncodedArrayIndex = 0;
 		encode(fileContents);
 		// TODO delete zip file
-		mFullDataSmsArrayList = costructFullDataSmsFromString(gsmEncode(
+		mFullDataSmsStringArrayList = costructFullDataSmsFromString(gsmEncode(
 				mEncoded7bits, mCurrentEncodedArrayIndex));
+	}
+
+	private String getExtention() {
+		String extension = "";
+		int i = mFileName.lastIndexOf('.');
+		int p = Math.max(mFileName.lastIndexOf('/'),
+				mFileName.lastIndexOf('\\'));
+		if (i > p)
+			extension = mFileName.substring(i + 1);
+		return extension.toLowerCase(Locale.getDefault());
 	}
 
 	private ArrayList<String> costructFullDataSmsFromString(
@@ -52,12 +73,36 @@ public class SMSFileSenderEngine implements SMSEngineConstants {
 		return tempFullDataSmsArrayList;
 	}
 
-	public ArrayList<String> getFullDataSms() {
-		return mFullDataSmsArrayList;
+	public ArrayList<DataSMS> getFullDataSms(Context context, String sessionId) {
+		String sessionSignatureChars = sessionId.substring(0, 2);
+		ArrayList<DataSMS> tempDataSmsArrayList = new ArrayList<DataSMS>();
+		SMSFileSharerDataBase db = new SMSFileSharerDataBase(context);
+		for (int i = 0; i < mFullDataSmsStringArrayList.size(); i++) {
+			if (!db.insertDataSms(sessionId, i, sessionSignatureChars + (i + 1)
+					+ CommenConstance.SMS_NEW_LINE_SPLITTER
+					+ mFullDataSmsStringArrayList.get(i)))
+				throw new RuntimeException(
+						context.getString(R.string.save_sms_file_to_db_first));
+			tempDataSmsArrayList.add(new DataSMS(sessionId, i, context));
+		}
+		db.close();
+		return tempDataSmsArrayList;
 	}
 
 	public int getFileContentLength() {
 		return mFileContentLength;
+	}
+
+	public String getFileName() {
+		return mFileName;
+	}
+
+	public String getMime() {
+		return mMime;
+	}
+
+	public int getNumberOfDataSms() {
+		return mFullDataSmsStringArrayList.size();
 	}
 
 	private String compressInputFile(String fileName) throws Exception {
