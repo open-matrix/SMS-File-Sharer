@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">SMS File Sharer</string>
+    <string name="error_while_setting_sms_status">Error while setting sms data status</string>
+    <string name="please_wait">Please wait&#8230;</string>
+    <string name="expectting_file_name">Expectting filename</string>
+
+</resources>
