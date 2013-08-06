@@ -3,7 +3,6 @@ package com.Matrix.smsfilesharer.model;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.Matrix.smsfilesharer.R;
 
@@ -54,7 +53,6 @@ public class ConstructSmsFileAsycTask extends AsyncTask<String, String, String> 
 					mContext, mSmsFile.getSessionId()));
 
 		} catch (Exception e) {
-			Log.e(TAG, e.getMessage());
 			mException = e;
 			isExaption = true;
 		}

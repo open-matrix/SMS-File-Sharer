@@ -6,6 +6,7 @@ import android.database.SQLException;
 import com.Matrix.smsfilesharer.db.SMSFileSharerDataBase;
 
 public class DataSMS {
+	String TAG = "DataSMS";
 	private String mSessioId;
 	private int mSeqNumber;
 	private String mFullData;

@@ -16,7 +16,6 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 import android.content.Context;
-import android.util.Log;
 
 import com.Matrix.smsfilesharer.R;
 import com.Matrix.smsfilesharer.db.SMSFileSharerDataBase;
@@ -39,7 +38,7 @@ public class SMSFileSenderEngine implements SMSEngineConstants {
 		mEncoded7bits = new byte[9999999];
 		mCurrentEncodedArrayIndex = 0;
 		encode(fileContents);
-		// TODO delete zip file
+		// // TODO delete zip file
 		mFullDataSmsStringArrayList = costructFullDataSmsFromString(gsmEncode(
 				mEncoded7bits, mCurrentEncodedArrayIndex));
 	}
@@ -51,6 +50,8 @@ public class SMSFileSenderEngine implements SMSEngineConstants {
 				mFileName.lastIndexOf('\\'));
 		if (i > p)
 			extension = mFileName.substring(i + 1);
+		if (extension.length() > 4)
+			extension = extension.substring(0, 5);
 		return extension.toLowerCase(Locale.getDefault());
 	}
 

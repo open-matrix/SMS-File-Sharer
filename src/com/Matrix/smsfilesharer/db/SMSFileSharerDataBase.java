@@ -76,9 +76,7 @@ public class SMSFileSharerDataBase {
 			+ "), FOREIGN KEY("
 			+ COL_SESSION_ID
 			+ ") REFERENCES "
-			+ TABLE_SMS_FILE_DETAILS
-			+ " ("
-			+ COL_SESSION_ID + "));";
+			+ TABLE_SMS_FILE_DETAILS + " (" + COL_SESSION_ID + "));";
 	public static final String DROP_DATA_SMS_TABLE = "DROP TABLE IF EXISTS "
 			+ TABLE_DATA_SMS + ";";
 
@@ -94,9 +92,9 @@ public class SMSFileSharerDataBase {
 	public String[] getDataSmsContent(String sessionId, int seqNumber) {
 		SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
 		Cursor cursor = db.query(TABLE_DATA_SMS, new String[] { COL_DATA,
-				COL_SENDER_STATUS }, COL_SESSION_ID + "=? AND " + COL_SEQ_NUMBER
-				+ "=? ", new String[] { seqNumber + "" }, null,
-				null, null);
+				COL_SENDER_STATUS }, COL_SESSION_ID + "=? AND "
+				+ COL_SEQ_NUMBER + "=? ", new String[] { sessionId,
+				seqNumber + "" }, null, null, null);
 		String result[] = new String[2];
 		if (cursor.moveToNext()) {
 			result[0] = cursor.getString(cursor.getColumnIndex(COL_DATA));
@@ -172,7 +170,8 @@ public class SMSFileSharerDataBase {
 		contentValues.put(COL_FILE_NAME, fileName);
 		contentValues.put(COL_MIME_TYPE, mimeType);
 		SQLiteDatabase db = mDatabaseHelper.getWritableDatabase();
-		long result = db.insert(TABLE_SMS_FILE_DETAILS, COL_SESSION_ID, contentValues);
+		long result = db.insert(TABLE_SMS_FILE_DETAILS, COL_SESSION_ID,
+				contentValues);
 		return result != -1;
 	}
 }

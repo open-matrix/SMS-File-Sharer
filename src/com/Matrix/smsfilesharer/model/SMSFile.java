@@ -32,7 +32,7 @@ public class SMSFile implements SMSFileFromFileNameErrorHandler,
 	public SMSFile(Context context, String fileName, String phoneNumber) {
 		mContext = context;
 		mAddress = phoneNumber;
-		isReceiver = false;
+		isReceiver = true;
 		isNoticeReceived = false;
 		mStatus = false;
 		mSessionId = generateSessionId();
