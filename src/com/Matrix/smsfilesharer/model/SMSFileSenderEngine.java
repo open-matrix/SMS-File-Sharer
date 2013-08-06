@@ -35,18 +35,10 @@ public class SMSFileSenderEngine implements SMSEngineConstants {
 		fileName = compressInputFile(fileName);
 		byte[] fileContents = read(fileName);
 		mFileContentLength = fileContents.length;
-		mEncoded7bits = new byte[fileContents.length*8/7];
+		mEncoded7bits = new byte[fileContents.length * 8 / 7];
 		mCurrentEncodedArrayIndex = 0;
 		encode(fileContents);
-<<<<<<< HEAD
-		// // TODO delete zip file
-=======
-		if(new File(fileName).delete()){
-			//successfully deleted
-		}else{
-			// tell the user to break his phone with a hammer
-		}
->>>>>>> 060ea4b989e2f0dc6b87383a4f022b93f0c13512
+		new File(fileName).delete();
 		mFullDataSmsStringArrayList = costructFullDataSmsFromString(gsmEncode(
 				mEncoded7bits, mCurrentEncodedArrayIndex));
 	}
