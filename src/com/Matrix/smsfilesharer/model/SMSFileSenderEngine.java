@@ -39,7 +39,11 @@ public class SMSFileSenderEngine implements SMSEngineConstants {
 		mEncoded7bits = new byte[fileContents.length*8/7];
 		mCurrentEncodedArrayIndex = 0;
 		encode(fileContents);
-		// TODO delete zip file
+		if(new File(fileName).delete()){
+			//successfully deleted
+		}else{
+			// tell the user to break his phone with a hammer
+		}
 		mFullDataSmsStringArrayList = costructFullDataSmsFromString(gsmEncode(
 				mEncoded7bits, mCurrentEncodedArrayIndex));
 	}
