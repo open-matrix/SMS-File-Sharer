@@ -36,7 +36,7 @@ public class SMSFileSenderEngine implements SMSEngineConstants {
 		fileName = compressInputFile(fileName);
 		byte[] fileContents = read(fileName);
 		mFileContentLength = fileContents.length;
-		mEncoded7bits = new byte[9999999];
+		mEncoded7bits = new byte[fileContents.length*8/7];
 		mCurrentEncodedArrayIndex = 0;
 		encode(fileContents);
 		// TODO delete zip file
